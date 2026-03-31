@@ -1,4 +1,4 @@
-using Exshell.Excel;
+using Exshell.ExcelInterop;
 using Exshell.Session;
 
 namespace Exshell.Commands;
@@ -26,13 +26,13 @@ public static class ElsCommand
         try
         {
             var session = SessionStore.LoadOrThrow();
-            var sheet   = sheetOverride ?? session.DefaultSheet;
+            var sheet   = sheetOverride ?? session.DefaultSheetName;
 
-            var app = ExcelBridge.GetOrCreateApplication();
-            var wb  = ExcelBridge.OpenOrGetWorkbook(app, session.WorkbookPath);
-            var ws  = ExcelBridge.GetWorksheet(wb, sheet);
+            var app = ExcelAppGateway.GetOrCreateApplication();
+            var wb  = WorkbookResolver.OpenOrGetWorkbook(app, session.WorkbookPath);
+            var ws  = WorksheetResolver.GetWorksheet(wb, sheet);
 
-            var shapes = ExcelBridge.ListTextShapes(ws);
+            var shapes = ShapeResolver.ListTextShapes(ws);
 
             Console.WriteLine($"[{ws.Name}]");
             foreach (var name in shapes)

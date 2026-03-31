@@ -1,4 +1,4 @@
-using Exshell.Excel;
+using Exshell.ExcelInterop;
 using Exshell.Session;
 
 namespace Exshell.Commands;
@@ -23,10 +23,12 @@ public static class EinfoCommand
                 return ExitCodes.SessionNotEstablished;
             }
 
-            var excelRunning = ExcelBridge.TryGetRunningExcel() != null ? "Running" : "Not running";
+            var excelRunning = ExcelAppGateway.TryGetRunningExcel() != null
+                ? "Running"
+                : "Not running";
 
             Console.WriteLine($"Workbook : {session.WorkbookPath}");
-            Console.WriteLine($"Sheet    : {session.DefaultSheet ?? "(active)"}");
+            Console.WriteLine($"Sheet    : {session.DefaultSheetName ?? "(active)"}");
             Console.WriteLine($"Excel    : {excelRunning}");
 
             return ExitCodes.Success;
@@ -34,7 +36,7 @@ public static class EinfoCommand
         catch (Exception ex)
         {
             Console.Error.WriteLine($"Error: {ex.Message}");
-            return ExitCodes.ExcelOperationFailed;
+            return ExitCodes.UnexpectedError;
         }
     }
 }

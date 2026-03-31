@@ -1,4 +1,5 @@
-using Exshell.Excel;
+using Exshell.Application.Models;
+using Exshell.ExcelInterop;
 using Exshell.Session;
 
 namespace Exshell.Commands;
@@ -34,17 +35,15 @@ public static class CateCommand
 
         try
         {
-            var session = SessionStore.LoadOrThrow();
-            var (sheetName, shapeName) = EcatCommand.ParseTarget(target, session.DefaultSheet);
+            var session  = SessionStore.LoadOrThrow();
+            var shapeRef = ShapeReference.Parse(target, session.DefaultSheetName);
+            var text     = Console.In.ReadToEnd();
 
-            // stdin を読み込む（パイプ入力）
-            var text = Console.In.ReadToEnd();
+            var app = ExcelAppGateway.GetOrCreateApplication();
+            var wb  = WorkbookResolver.OpenOrGetWorkbook(app, session.WorkbookPath);
+            var ws  = WorksheetResolver.GetWorksheet(wb, shapeRef.SheetName);
 
-            var app = ExcelBridge.GetOrCreateApplication();
-            var wb  = ExcelBridge.OpenOrGetWorkbook(app, session.WorkbookPath);
-            var ws  = ExcelBridge.GetWorksheet(wb, sheetName);
-
-            ExcelBridge.SetShapeText(ws, shapeName, text, append);
+            ShapeTextAccessor.SetShapeText(ws, shapeRef.ShapeName, text, append);
 
             return ExitCodes.Success;
         }

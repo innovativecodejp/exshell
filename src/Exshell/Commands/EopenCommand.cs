@@ -1,4 +1,4 @@
-using Exshell.Excel;
+using Exshell.ExcelInterop;
 using Exshell.Session;
 
 namespace Exshell.Commands;
@@ -33,22 +33,22 @@ public static class EopenCommand
         try
         {
             var fullPath = Path.GetFullPath(filePath);
-            var app      = ExcelBridge.GetOrCreateApplication();
-            var wb       = ExcelBridge.OpenOrGetWorkbook(app, fullPath);
+            var app      = ExcelAppGateway.GetOrCreateApplication();
+            var wb       = WorkbookResolver.OpenOrGetWorkbook(app, fullPath);
 
-            // シート名が指定されていれば存在確認
-            var ws          = ExcelBridge.GetWorksheet(wb, sheet);
-            var defaultSheet = ws.Name;
+            // シート名が指定されていれば存在確認、なければアクティブシートを採用
+            var ws              = WorksheetResolver.GetWorksheet(wb, sheet);
+            var defaultSheetName = ws.Name;
 
-            var session = new ExshellSession
+            var session = new SessionInfo
             {
-                WorkbookPath = fullPath,
-                DefaultSheet = defaultSheet,
+                WorkbookPath     = fullPath,
+                DefaultSheetName = defaultSheetName,
             };
             SessionStore.Save(session);
 
             Console.WriteLine($"Workbook : {fullPath}");
-            Console.WriteLine($"Sheet    : {defaultSheet}");
+            Console.WriteLine($"Sheet    : {defaultSheetName}");
             return ExitCodes.Success;
         }
         catch (ExshellException ex)

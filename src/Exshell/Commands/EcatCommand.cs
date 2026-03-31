@@ -1,4 +1,5 @@
-using Exshell.Excel;
+using Exshell.Application.Models;
+using Exshell.ExcelInterop;
 using Exshell.Session;
 
 namespace Exshell.Commands;
@@ -18,17 +19,15 @@ public static class EcatCommand
             return ExitCodes.ArgumentError;
         }
 
-        var target = args[0];
-
         try
         {
-            var session = SessionStore.LoadOrThrow();
-            var (sheetName, shapeName) = ParseTarget(target, session.DefaultSheet);
+            var session  = SessionStore.LoadOrThrow();
+            var shapeRef = ShapeReference.Parse(args[0], session.DefaultSheetName);
 
-            var app  = ExcelBridge.GetOrCreateApplication();
-            var wb   = ExcelBridge.OpenOrGetWorkbook(app, session.WorkbookPath);
-            var ws   = ExcelBridge.GetWorksheet(wb, sheetName);
-            var text = ExcelBridge.GetShapeText(ws, shapeName);
+            var app  = ExcelAppGateway.GetOrCreateApplication();
+            var wb   = WorkbookResolver.OpenOrGetWorkbook(app, session.WorkbookPath);
+            var ws   = WorksheetResolver.GetWorksheet(wb, shapeRef.SheetName);
+            var text = ShapeTextAccessor.GetShapeText(ws, shapeRef.ShapeName);
 
             Console.Write(text);
 
@@ -48,16 +47,5 @@ public static class EcatCommand
             Console.Error.WriteLine($"Error: {ex.Message}");
             return ExitCodes.ExcelOperationFailed;
         }
-    }
-
-    /// <summary>
-    /// "Sheet:Shape" または "Shape" を解析する。
-    /// </summary>
-    internal static (string? sheetName, string shapeName) ParseTarget(string target, string? defaultSheet)
-    {
-        var colon = target.IndexOf(':');
-        if (colon >= 0)
-            return (target[..colon], target[(colon + 1)..]);
-        return (defaultSheet, target);
     }
 }

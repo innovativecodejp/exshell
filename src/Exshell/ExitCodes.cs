@@ -10,4 +10,6 @@ public static class ExitCodes
     public const int ShapeNotFound         = 5;
     public const int ExcelOperationFailed  = 6;
     public const int WslExecutionFailed    = 7;
+    public const int TempFileError         = 8;
+    public const int UnexpectedError       = 9;
 }
