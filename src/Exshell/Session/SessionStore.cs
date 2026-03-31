@@ -1,0 +1,50 @@
+using System.Text.Json;
+
+namespace Exshell.Session;
+
+public static class SessionStore
+{
+    private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
+
+    private static string SessionPath =>
+        Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+            ".exshell",
+            "session.json"
+        );
+
+    public static ExshellSession? Load()
+    {
+        if (!File.Exists(SessionPath))
+            return null;
+
+        try
+        {
+            var json = File.ReadAllText(SessionPath);
+            return JsonSerializer.Deserialize<ExshellSession>(json);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public static void Save(ExshellSession session)
+    {
+        var dir = Path.GetDirectoryName(SessionPath)!;
+        Directory.CreateDirectory(dir);
+        var json = JsonSerializer.Serialize(session, JsonOptions);
+        File.WriteAllText(SessionPath, json);
+    }
+
+    public static ExshellSession LoadOrThrow()
+    {
+        var session = Load();
+        if (session == null || string.IsNullOrEmpty(session.WorkbookPath))
+            throw new ExshellException(
+                "No active session. Run 'eopen <file>' first.",
+                ExitCodes.SessionNotEstablished
+            );
+        return session;
+    }
+}
