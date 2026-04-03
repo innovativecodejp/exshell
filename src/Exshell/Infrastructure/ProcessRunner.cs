@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text;
 
 namespace Exshell.Infrastructure;
 
@@ -20,24 +21,27 @@ public static class ProcessRunner
             Arguments              = arguments,
             RedirectStandardOutput = true,
             RedirectStandardError  = true,
+            StandardOutputEncoding = Encoding.UTF8,
+            StandardErrorEncoding  = Encoding.UTF8,
             UseShellExecute        = false,
+            CreateNoWindow         = true,
         };
 
         using var proc = Process.Start(psi)
-            ?? throw new ExshellException("Failed to start WSL process.", ExitCodes.WslExecutionFailed);
+            ?? throw new ExshellException("Failed to start WSL process.", ExitCodes.DiffExecutionFailed);
 
-        proc.OutputDataReceived += (_, e) =>
-        {
-            if (e.Data != null) Console.WriteLine(e.Data);
-        };
-        proc.ErrorDataReceived += (_, e) =>
-        {
-            if (e.Data != null) Console.Error.WriteLine(e.Data);
-        };
-
-        proc.BeginOutputReadLine();
-        proc.BeginErrorReadLine();
+        var stdoutTask = proc.StandardOutput.ReadToEndAsync();
+        var stderrTask = proc.StandardError.ReadToEndAsync();
         proc.WaitForExit();
+
+        var stdout = stdoutTask.GetAwaiter().GetResult();
+        var stderr = stderrTask.GetAwaiter().GetResult();
+
+        if (!string.IsNullOrEmpty(stdout))
+            Console.Write(stdout);
+
+        if (!string.IsNullOrEmpty(stderr))
+            Console.Error.Write(stderr);
 
         return proc.ExitCode;
     }

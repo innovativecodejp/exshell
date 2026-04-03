@@ -1,7 +1,7 @@
 namespace Exshell.Session;
 
 /// <summary>
-/// セッション情報。~/.exshell/session.json に永続化される。
+/// セッション情報。%APPDATA%\Exshell\session.json に永続化される。
 /// </summary>
 public sealed class SessionInfo
 {

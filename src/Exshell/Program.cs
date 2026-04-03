@@ -1,5 +1,10 @@
 using Exshell;
 using Exshell.Commands;
+using System.Text;
+
+var utf8NoBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
+Console.InputEncoding = utf8NoBom;
+Console.OutputEncoding = utf8NoBom;
 
 if (args.Length == 0)
 {

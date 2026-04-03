@@ -37,7 +37,17 @@ public static class CateCommand
         {
             var session  = SessionStore.LoadOrThrow();
             var shapeRef = ShapeReference.Parse(target, session.DefaultSheetName);
-            var text     = Console.In.ReadToEnd();
+            string text;
+
+            try
+            {
+                text = Console.In.ReadToEnd();
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Failed to read standard input: {ex.Message}");
+                return ExitCodes.StandardInputFailed;
+            }
 
             var app = ExcelAppGateway.GetOrCreateApplication();
             var wb  = WorkbookResolver.OpenOrGetWorkbook(app, session.WorkbookPath);

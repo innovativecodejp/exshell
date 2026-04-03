@@ -54,7 +54,7 @@ public static class EdiffCommand
             if (exitCode == 2)
             {
                 Console.Error.WriteLine("WSL diff execution failed.");
-                return ExitCodes.WslExecutionFailed;
+                return ExitCodes.DiffExecutionFailed;
             }
 
             return ExitCodes.Success;

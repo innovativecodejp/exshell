@@ -8,8 +8,8 @@ public static class SessionStore
 
     private static string SessionPath =>
         Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-            ".exshell",
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "Exshell",
             "session.json"
         );
 

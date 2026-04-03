@@ -1,4 +1,5 @@
 using Exshell.ExcelInterop;
+using Exshell.Infrastructure;
 using Exshell.Session;
 
 namespace Exshell.Commands;
@@ -32,7 +33,7 @@ public static class EopenCommand
 
         try
         {
-            var fullPath = Path.GetFullPath(filePath);
+            var fullPath = PathConverter.NormalizeWindowsPath(filePath);
             var app      = ExcelAppGateway.GetOrCreateApplication();
             var wb       = WorkbookResolver.OpenOrGetWorkbook(app, fullPath);
 
