@@ -65,16 +65,24 @@ public class ExshellExceptionTests
         // Arrange
         var message = "Base exception test";
         var exitCode = ExitCodes.TempFileError;
+        Exception? caughtException = null;
 
-        // Act & Assert
-        var exception = Assert.Throws<Exception>((Action)(() =>
+        // Act
+        try
         {
             throw new ExshellException(message, exitCode);
-        }));
+        }
+        catch (Exception ex)
+        {
+            caughtException = ex;
+        }
 
-        Assert.IsType<ExshellException>(exception);
-        var exshellException = (ExshellException)exception;
-        Assert.Equal(message, exshellException.Message);
+        // Assert
+        Assert.NotNull(caughtException);
+        Assert.IsType<ExshellException>(caughtException);
+        Assert.Equal(message, caughtException.Message);
+        
+        var exshellException = (ExshellException)caughtException;
         Assert.Equal(exitCode, exshellException.ExitCode);
     }
 }
