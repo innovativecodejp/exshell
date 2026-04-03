@@ -15,6 +15,9 @@ public static class ProcessRunner
     /// <returns>プロセス終了コード</returns>
     public static int RunWsl(string arguments)
     {
+        if (string.IsNullOrEmpty(arguments))
+            throw new ExshellException("WSL command is required.", ExitCodes.ArgumentError);
+
         var psi = new ProcessStartInfo
         {
             FileName               = "wsl",
