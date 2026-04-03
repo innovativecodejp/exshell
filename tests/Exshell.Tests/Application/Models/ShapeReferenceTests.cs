@@ -81,7 +81,7 @@ public class ShapeReferenceTests
 
     [Theory]
     [InlineData("Main:txtInput", "Main:txtInput")]
-    [InlineData("txtOutput", "txtOutput")]
+    [InlineData("txtOutput", "Sheet1:txtOutput")]
     public void ToString_ReturnsExpectedFormat(string input, string expected)
     {
         // Arrange
