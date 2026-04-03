@@ -113,6 +113,21 @@ public class SessionStoreTests : IDisposable
     [Fact]
     public void LoadOrThrow_WithNoSession_ThrowsException()
     {
+        // Arrange - ensure no session file exists
+        var sessionPath = Path.Combine(_tempDirectory, "Exshell", "session.json");
+        if (File.Exists(sessionPath))
+        {
+            File.Delete(sessionPath);
+        }
+        
+        // Also clean up the entire Exshell directory if it exists
+        var exshellDir = Path.Combine(_tempDirectory, "Exshell");
+        if (Directory.Exists(exshellDir))
+        {
+            Directory.Delete(exshellDir, true);
+        }
+
+
         // Act & Assert
         var exception = Assert.Throws<ExshellException>(() => SessionStore.LoadOrThrow());
         Assert.Equal(ExitCodes.SessionNotEstablished, exception.ExitCode);
