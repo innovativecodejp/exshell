@@ -52,10 +52,26 @@ public static partial class PathConverter
         {
             var drive = char.ToLowerInvariant(normalized[0]);
             var rest  = normalized[2..].Replace('\\', '/');
-            return $"/mnt/{drive}{rest}";
+            var wslPath = $"/mnt/{drive}{rest}";
+            
+            // Remove trailing slash if it exists (except for root)
+            if (wslPath.Length > 1 && wslPath.EndsWith('/'))
+            {
+                wslPath = wslPath.TrimEnd('/');
+            }
+            
+            return wslPath;
         }
 
-        return normalized.Replace('\\', '/');
+        var result = normalized.Replace('\\', '/');
+        
+        // Remove trailing slash if it exists (except for root)
+        if (result.Length > 1 && result.EndsWith('/'))
+        {
+            result = result.TrimEnd('/');
+        }
+        
+        return result;
     }
 
     private static string TrimEnclosingQuotes(string path)
